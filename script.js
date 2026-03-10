@@ -1,5 +1,5 @@
 // CONFIGURAÇÃO - COLE O LINK DO GOOGLE AQUI
-const URL_GOOGLE_SHEET = "SUA_URL_DO_APPS_SCRIPT_AQUI";
+const URL_GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbxORHScl-M4a14MGwIpZFV3xpAAbhJ4iyxpXvoFPwryAuJF3sM88DeyYeAhJVpz3S_5/exec";
 
 // Máscara CPF
 document.getElementById('cpf').addEventListener('input', (e) => {
