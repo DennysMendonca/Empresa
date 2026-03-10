@@ -1,47 +1,58 @@
-// --- MÁSCARA DE CPF (000.000.000-00) ---
+// CONFIGURAÇÃO - COLE O LINK DO GOOGLE AQUI
+const URL_GOOGLE_SHEET = "SUA_URL_DO_APPS_SCRIPT_AQUI";
+
+// Máscara CPF
 document.getElementById('cpf').addEventListener('input', (e) => {
-    let value = e.target.value.replace(/\D/g, "");
-    value = value.replace(/(\d{3})(\d)/, "$1.$2");
-    value = value.replace(/(\d{3})(\d)/, "$1.$2");
-    value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    e.target.value = value;
+    let v = e.target.value.replace(/\D/g, "");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    e.target.value = v;
 });
 
-// --- MÁSCARA DE TELEFONE ((00) 00000-0000) ---
+// Máscara Telefone
 document.getElementById('telefone').addEventListener('input', (e) => {
-    let value = e.target.value.replace(/\D/g, "");
-    value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
-    value = value.replace(/(\d{5})(\d)/, "$1-$2");
-    e.target.value = value;
+    let v = e.target.value.replace(/\D/g, "");
+    v = v.replace(/^(\d{2})(\d)/g, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+    e.target.value = v;
 });
 
-// --- MÁSCARA DE SALÁRIO (R$ 0.000,00) ---
+// Máscara Salário
 document.getElementById('salario').addEventListener('input', (e) => {
-    let value = e.target.value.replace(/\D/g, "");
-    
-    // Converte para formato decimal
-    value = (value / 100).toFixed(2) + "";
-    value = value.replace(".", ",");
-    
-    // Adiciona pontos de milhar
-    value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-    
-    e.target.value = value ? "R$ " + value : "";
+    let v = e.target.value.replace(/\D/g, "");
+    v = (v / 100).toFixed(2).replace(".", ",");
+    v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    e.target.value = v ? "R$ " + v : "";
 });
 
-// --- LÓGICA DE SALVAR ---
+// Função Sair
+function sair() {
+    if(confirm("Deseja realmente sair? Dados não salvos serão perdidos.")) {
+        window.close(); // Fecha a aba (funciona se a aba foi aberta via script)
+        window.location.href = "about:blank"; // Fallback
+    }
+}
+
+// Envio para o Google Sheets
 document.getElementById('formFuncionario').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // Aqui você pegaria os valores para enviar ao servidor
-    const nome = document.getElementById('nome').value;
-    const cpf = document.getElementById('cpf').value;
-    
-    alert(`Sucesso!\nOs dados de ${nome} (CPF: ${cpf}) foram validados e estão prontos para o banco de dados.`);
-    
-    console.log("Dados prontos:", {
-        nome: nome,
-        cpf: cpf,
-        salario: document.getElementById('salario').value
+    const btn = document.querySelector('.btn-save');
+    btn.innerText = "Enviando...";
+    btn.disabled = true;
+
+    const formData = new FormData(this);
+    const data = new URLSearchParams(formData);
+
+    fetch(URL_GOOGLE_SHEET, {
+        method: 'POST',
+        body: data
+    })
+    .then(() => {
+        alert("Cadastrado com sucesso na planilha!");
+        this.reset();
+    })
+    .catch(() => alert("Erro ao conectar com a planilha."))
+    .finally(() => {
+        btn.innerText = "Salvar";
+        btn.disabled = false;
     });
 });
